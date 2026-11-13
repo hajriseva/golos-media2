@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ГОЛОС — Интерактивное медиа</title>
+    <!-- Подключаем библиотеку графиков Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0E0E11;
+            --card-bg: #18181D;
+            --accent: #CCFF00;
+            --text: #F4F4F5;
+            --text-muted: #A1A1AA;
+            --purple: #8B5CF6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; }
+        header { text-align: center; margin-bottom: 30px; }
+        .logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
+        .subtitle { font-size: 14px; color: var(--text-muted); margin-top: 5px; }
+        .card { background-color: var(--card-bg); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #27272A; }
+        h2 { font-size: 18px; margin-bottom: 16px; color: var(--text); }
+        .question { margin-bottom: 20px; }
+        .question label { display: block; font-size: 14px; margin-bottom: 8px; color: var(--text-muted); }
+        input[type="range"] { width: 100%; accent-color: var(--accent); height: 8px; border-radius: 4px; background: #27272A; outline: none; }
+        .range-values { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        button { width: 100%; background-color: var(--accent); color: #000; font-weight: 700; padding: 14px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
+        .hidden { display: none !important; }
+        .result-box { text-align: center; }
+        .stat-highlight { font-size: 28px; font-weight: 800; color: var(--accent); margin: 10px 0; }
+        canvas { margin-top: 15px; max-height: 220px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">ГОЛОС</div>
+        <div class="subtitle">Срез поколения • Спецпроект №1</div>
+    </header>
+
+    <!-- Блок опроса -->
+    <div id="quiz-card" class="card">
+        <h2>Сколько часов в день ты сидишь в телефоне?</h2>
+        <div class="question">
+            <label>Выбери примерное число часов:</label>
+            <input type="range" id="hoursInput" min="1" max="10" value="5" oninput="updateVal(this.value)">
+            <div class="range-values">
+                <span>1 час</span>
+                <span id="valDisplay" style="color: var(--accent); font-weight: bold; font-size: 16px;">5 часов</span>
+                <span>10+ часов</span>
+            </div>
+        </div>
+        <button onclick="submitAnswer()">Узнать результат школы</button>
+    </div>
+
+    <!-- Блок результатов и графиков -->
+    <div id="result-card" class="card hidden">
+        <h2>Твой результат vs Школа</h2>
+        <div class="result-box">
+            <p>Ты проводишь в телефоне:</p>
+            <div class="stat-highlight" id="userChoiceText">5 часов</div>
+            <p style="font-size: 13px; color: var(--text-muted);">В среднем по школе этот показатель составляет 5.4 часа.</p>
+        </div>
+        
+        <!-- График -->
+        <canvas id="myChart"></canvas>
+        
+        <button style="margin-top: 20px; background-color: var(--purple); color: #fff;" onclick="resetQuiz()">Пройти заново</button>
+    </div>
+</div>
+
+<script>
+    function updateVal(val) {
+        document.getElementById('valDisplay').innerText = val + ' часов';
+    }
+
+    let myChartInstance = null;
+
+    function submitAnswer() {
+        const userVal = document.getElementById('hoursInput').value;
+        document.getElementById('userChoiceText').innerText = userVal + ' часов';
+
+        // Скрываем опрос, показываем результат
+        document.getElementById('quiz-card').classList.add('hidden');
+        document.getElementById('result-card').classList.remove('hidden');
+
+        // Рисуем график
+        const ctx = document.getElementById('myChart').getContext('2d');
+        
+        if (myChartInstance) {
+            myChartInstance.destroy();
+        }
+
+        myChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Ты', 'Среднее по школе'],
+                datasets: [{
+                    label: 'Часов в телефоне',
+                    data: [userVal, 5.4],
+                    backgroundColor: ['#CCFF00', '#8B5CF6'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        grid: { color: '#27272A' },
+                        ticks: { color: '#A1A1AA' }
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { color: '#F4F4F5' }
+                    }
+                }
+            }
+        });
+    }
+
+    function resetQuiz() {
+        document.getElementById('result-card').classList.add('hidden');
+        document.getElementById('quiz-card').classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>
