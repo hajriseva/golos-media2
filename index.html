@@ -14,6 +14,7 @@
             --text: #F4F4F5;
             --text-muted: #A1A1AA;
             --purple: #8B5CF6;
+            --coral: #FF5C5C;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
@@ -25,13 +26,22 @@
         h2 { font-size: 18px; margin-bottom: 16px; color: var(--text); }
         .question { margin-bottom: 20px; }
         .question label { display: block; font-size: 14px; margin-bottom: 8px; color: var(--text-muted); }
-        input[type="range"] { width: 100%; accent-color: var(--accent); height: 8px; border-radius: 4px; background: #27272A; outline: none; }
-        .range-values { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-        button { width: 100%; background-color: var(--accent); color: #000; font-weight: 700; padding: 14px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.98); }
+        input[type="range"] { width: 100%; accent-color: var(--accent); height: 8px; border-radius: 4px; background: #27272A; outline: none; margin-bottom: 10px; }
+        .range-values { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .option-btn { background: #27272A; border: 2px solid transparent; color: var(--text); padding: 12px 16px; border-radius: 10px; text-align: left; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .option-btn.selected { border-color: var(--accent); background: rgba(204, 255, 0, 0.05); color: var(--accent); font-weight: bold; }
+
+        button.main-btn { width: 100%; background-color: var(--accent); color: #000; font-weight: 700; padding: 14px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        button.main-btn:active { transform: scale(0.98); }
+        
         .hidden { display: none !important; }
-        .result-box { text-align: center; }
-        .stat-highlight { font-size: 28px; font-weight: 800; color: var(--accent); margin: 10px 0; }
+        .result-box { text-align: center; margin-bottom: 20px; }
+        .stat-highlight { font-size: 24px; font-weight: 800; color: var(--accent); margin: 8px 0; }
+        
+        .editorial-note { background: rgba(139, 92, 246, 0.1); border-left: 4px solid var(--purple); padding: 12px; border-radius: 0 10px 10px 0; font-size: 13px; color: var(--text-muted); margin-top: 20px; line-height: 1.4; }
+        .editorial-note strong { color: var(--text); }
         canvas { margin-top: 15px; max-height: 220px; }
     </style>
 </head>
@@ -40,14 +50,14 @@
 <div class="container">
     <header>
         <div class="logo">ГОЛОС</div>
-        <div class="subtitle">Срез поколения • Спецпроект №1</div>
+        <div class="subtitle">Срез поколения • Выпуск №1</div>
     </header>
 
     <!-- Блок опроса -->
     <div id="quiz-card" class="card">
-        <h2>Сколько часов в день ты сидишь в телефоне?</h2>
+        <h2>Часть 1: Цифровой след</h2>
         <div class="question">
-            <label>Выбери примерное число часов:</label>
+            <label>Сколько часов в день ты проводишь в телефоне?</label>
             <input type="range" id="hoursInput" min="1" max="10" value="5" oninput="updateVal(this.value)">
             <div class="range-values">
                 <span>1 час</span>
@@ -55,41 +65,67 @@
                 <span>10+ часов</span>
             </div>
         </div>
-        <button onclick="submitAnswer()">Узнать результат школы</button>
+
+        <h2 style="margin-top: 24px;">Часть 2: Школьные будни</h2>
+        <div class="question">
+            <label>Что тебя сильнее всего утомляет за неделю?</label>
+            <div class="options-grid" id="fatigueOptions">
+                <button class="option-btn selected" onclick="selectOption(this, 'Ранний подъём')">🌅 Ранний подъём</button>
+                <button class="option-btn" onclick="selectOption(this, 'Шум на переменах')">🗣️ Шум на переменах</button>
+                <button class="option-btn" onclick="selectOption(this, 'Бесконечная домашка')">📚 Бесконечная домашка</button>
+                <button class="option-btn" onclick="selectOption(this, 'Ожидание каникул')">⏳ Ожидание каникул</button>
+            </div>
+        </div>
+
+        <button class="main-btn" onclick="submitAnswer()">Узнать результаты школы</button>
     </div>
 
     <!-- Блок результатов и графиков -->
     <div id="result-card" class="card hidden">
-        <h2>Твой результат vs Школа</h2>
+        <h2>Итоги исследования</h2>
+        
         <div class="result-box">
-            <p>Ты проводишь в телефоне:</p>
-            <div class="stat-highlight" id="userChoiceText">5 часов</div>
-            <p style="font-size: 13px; color: var(--text-muted);">В среднем по школе этот показатель составляет 5.4 часа.</p>
+            <p>Твой выбор по утомляемости:</p>
+            <div class="stat-highlight" id="userChoiceFatigue">Ранний подъём</div>
+            <p style="font-size: 13px; color: var(--text-muted);">Экранное время: <span id="userChoiceHours" style="color: var(--accent); font-weight: bold;">5 часов</span></p>
         </div>
         
         <!-- График -->
         <canvas id="myChart"></canvas>
+
+        <div class="editorial-note">
+            <strong>Мнение редакции:</strong> Цифры показывают, что ритм недели давит на всех одинаково. Но экранное время отнимает у нас больше ресурсов, чем кажется на первый взгляд.
+        </div>
         
-        <button style="margin-top: 20px; background-color: var(--purple); color: #fff;" onclick="resetQuiz()">Пройти заново</button>
+        <button class="main-btn" style="margin-top: 20px; background-color: var(--purple); color: #fff;" onclick="resetQuiz()">Пройти заново</button>
     </div>
 </div>
 
 <script>
+    let selectedFatigue = 'Ранний подъём';
+
     function updateVal(val) {
         document.getElementById('valDisplay').innerText = val + ' часов';
+    }
+
+    function selectOption(button, value) {
+        document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+        selectedFatigue = value;
     }
 
     let myChartInstance = null;
 
     function submitAnswer() {
         const userVal = document.getElementById('hoursInput').value;
-        document.getElementById('userChoiceText').innerText = userVal + ' часов';
+        document.getElementById('userChoiceHours').innerText = userVal + ' часов';
+        document.getElementById('userChoiceFatigue').innerText = selectedFatigue;
 
-        // Скрываем опрос, показываем результат
+        // Переключаем экраны
         document.getElementById('quiz-card').classList.add('hidden');
         document.getElementById('result-card').classList.remove('hidden');
 
-        // Рисуем график
+        // Строим график
         const ctx = document.getElementById('myChart').getContext('2d');
         
         if (myChartInstance) {
@@ -99,9 +135,9 @@
         myChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Ты', 'Среднее по школе'],
+                labels: ['Твой телефон', 'Среднее в школе'],
                 datasets: [{
-                    label: 'Часов в телефоне',
+                    label: 'Часов в день',
                     data: [userVal, 5.4],
                     backgroundColor: ['#CCFF00', '#8B5CF6'],
                     borderRadius: 8
@@ -134,4 +170,5 @@
 </script>
 
 </body>
-</html>
+    </html>
+
