@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ГОЛОС — Интерактивное медиа</title>
-    <!-- Подключаем библиотеку графиков Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -14,7 +13,6 @@
             --text: #F4F4F5;
             --text-muted: #A1A1AA;
             --purple: #8B5CF6;
-            --coral: #FF5C5C;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
@@ -121,11 +119,9 @@
         document.getElementById('userChoiceHours').innerText = userVal + ' часов';
         document.getElementById('userChoiceFatigue').innerText = selectedFatigue;
 
-        // Переключаем экраны
         document.getElementById('quiz-card').classList.add('hidden');
         document.getElementById('result-card').classList.remove('hidden');
 
-        // Строим график
         const ctx = document.getElementById('myChart').getContext('2d');
         
         if (myChartInstance) {
@@ -170,5 +166,4 @@
 </script>
 
 </body>
-    </html>
-
+</html>
