@@ -17,30 +17,31 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 480px; }
-        header { text-align: center; margin-bottom: 30px; }
+        header { text-align: center; margin-bottom: 25px; }
         .logo { font-size: 32px; font-weight: 900; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; }
         .subtitle { font-size: 14px; color: var(--text-muted); margin-top: 5px; }
-        .card { background-color: var(--card-bg); border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #27272A; }
-        h2 { font-size: 18px; margin-bottom: 16px; color: var(--text); }
-        .question { margin-bottom: 20px; }
+        .card { background-color: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid #27272A; }
+        h2 { font-size: 18px; margin-bottom: 14px; color: var(--text); }
+        .question { margin-bottom: 16px; }
         .question label { display: block; font-size: 14px; margin-bottom: 8px; color: var(--text-muted); }
         input[type="range"] { width: 100%; accent-color: var(--accent); height: 8px; border-radius: 4px; background: #27272A; outline: none; margin-bottom: 10px; }
         .range-values { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
         
-        .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        .option-btn { background: #27272A; border: 2px solid transparent; color: var(--text); padding: 12px 16px; border-radius: 10px; text-align: left; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .options-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .option-btn { background: #27272A; border: 2px solid transparent; color: var(--text); padding: 12px 14px; border-radius: 10px; text-align: left; cursor: pointer; font-size: 14px; transition: 0.2s; }
         .option-btn.selected { border-color: var(--accent); background: rgba(204, 255, 0, 0.05); color: var(--accent); font-weight: bold; }
 
         button.main-btn { width: 100%; background-color: var(--accent); color: #000; font-weight: 700; padding: 14px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: 0.2s; }
         button.main-btn:active { transform: scale(0.98); }
         
         .hidden { display: none !important; }
-        .result-box { text-align: center; margin-bottom: 20px; }
-        .stat-highlight { font-size: 24px; font-weight: 800; color: var(--accent); margin: 8px 0; }
+        .result-box { text-align: center; margin-bottom: 15px; }
+        .stat-highlight { font-size: 20px; font-weight: 800; color: var(--accent); margin: 5px 0; }
         
-        .editorial-note { background: rgba(139, 92, 246, 0.1); border-left: 4px solid var(--purple); padding: 12px; border-radius: 0 10px 10px 0; font-size: 13px; color: var(--text-muted); margin-top: 20px; line-height: 1.4; }
+        .editorial-note { background: rgba(139, 92, 246, 0.1); border-left: 4px solid var(--purple); padding: 12px; border-radius: 0 10px 10px 0; font-size: 13px; color: var(--text-muted); margin-top: 15px; line-height: 1.4; }
         .editorial-note strong { color: var(--text); }
-        canvas { margin-top: 15px; max-height: 220px; }
+        
+        .chart-container { position: relative; margin-top: 15px; height: 180px; }
     </style>
 </head>
 <body>
@@ -64,10 +65,10 @@
             </div>
         </div>
 
-        <h2 style="margin-top: 24px;">Часть 2: Школьные будни</h2>
+        <h2 style="margin-top: 20px;">Часть 2: Школьные будни</h2>
         <div class="question">
             <label>Что тебя сильнее всего утомляет за неделю?</label>
-            <div class="options-grid" id="fatigueOptions">
+            <div class="options-grid">
                 <button class="option-btn selected" onclick="selectOption(this, 'Ранний подъём')">🌅 Ранний подъём</button>
                 <button class="option-btn" onclick="selectOption(this, 'Шум на переменах')">🗣️ Шум на переменах</button>
                 <button class="option-btn" onclick="selectOption(this, 'Бесконечная домашка')">📚 Бесконечная домашка</button>
@@ -83,16 +84,24 @@
         <h2>Итоги исследования</h2>
         
         <div class="result-box">
-            <p>Твой выбор по утомляемости:</p>
-            <div class="stat-highlight" id="userChoiceFatigue">Ранний подъём</div>
-            <p style="font-size: 13px; color: var(--text-muted);">Экранное время: <span id="userChoiceHours" style="color: var(--accent); font-weight: bold;">5 часов</span></p>
+            <p>Твой выбор утомляемости: <span id="userChoiceFatigue" style="color: var(--accent); font-weight: bold;">Ранний подъём</span></p>
+            <div class="stat-highlight">Экранное время: <span id="userChoiceHours">5</span> ч. (Школа: 5.4 ч.)</div>
         </div>
         
-        <!-- График -->
-        <canvas id="myChart"></canvas>
+        <!-- График 1: Телефон -->
+        <h2 style="font-size: 14px; color: var(--text-muted); margin-bottom: 5px;">Сравнение экранного времени</h2>
+        <div class="chart-container">
+            <canvas id="phoneChart"></canvas>
+        </div>
+
+        <!-- График 2: Усталость (распределение по школе) -->
+        <h2 style="font-size: 14px; color: var(--text-muted); margin-top: 20px; margin-bottom: 5px;">Что утомляет всю школу (% голосов)</h2>
+        <div class="chart-container">
+            <canvas id="fatigueChart"></canvas>
+        </div>
 
         <div class="editorial-note">
-            <strong>Мнение редакции:</strong> Цифры показывают, что ритм недели давит на всех одинаково. Но экранное время отнимает у нас больше ресурсов, чем кажется на первый взгляд.
+            <strong>Мнение редакции:</strong> Большинство выбирает ранний подъём и экраны. Мы все живем в одном темпе, но каждый справляется с нагрузкой по-своему.
         </div>
         
         <button class="main-btn" style="margin-top: 20px; background-color: var(--purple); color: #fff;" onclick="resetQuiz()">Пройти заново</button>
@@ -112,48 +121,81 @@
         selectedFatigue = value;
     }
 
-    let myChartInstance = null;
+    let phoneChartInstance = null;
+    let fatigueChartInstance = null;
 
     function submitAnswer() {
         const userVal = document.getElementById('hoursInput').value;
-        document.getElementById('userChoiceHours').innerText = userVal + ' часов';
+        document.getElementById('userChoiceHours').innerText = userVal;
         document.getElementById('userChoiceFatigue').innerText = selectedFatigue;
 
         document.getElementById('quiz-card').classList.add('hidden');
         document.getElementById('result-card').classList.remove('hidden');
 
-        const ctx = document.getElementById('myChart').getContext('2d');
-        
-        if (myChartInstance) {
-            myChartInstance.destroy();
-        }
+        // 1. График телефонов
+        const ctxPhone = document.getElementById('phoneChart').getContext('2d');
+        if (phoneChartInstance) phoneChartInstance.destroy();
 
-        myChartInstance = new Chart(ctx, {
+        phoneChartInstance = new Chart(ctxPhone, {
             type: 'bar',
             data: {
-                labels: ['Твой телефон', 'Среднее в школе'],
+                labels: ['Ты', 'Среднее в школе'],
                 datasets: [{
-                    label: 'Часов в день',
                     data: [userVal, 5.4],
                     backgroundColor: ['#CCFF00', '#8B5CF6'],
-                    borderRadius: 8
+                    borderRadius: 6
                 }]
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: { display: false }
-                },
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: { 
-                        beginAtZero: true,
-                        grid: { color: '#27272A' },
-                        ticks: { color: '#A1A1AA' }
+                    y: { beginAtZero: true, grid: { color: '#27272A' }, ticks: { color: '#A1A1AA' } },
+                    x: { grid: { display: false }, ticks: { color: '#F4F4F5' } }
+                }
+            }
+        });
+
+        // 2. График утомляемости (статистика по школе)
+        const ctxFatigue = document.getElementById('fatigueChart').getContext('2d');
+        if (fatigueChartInstance) fatigueChartInstance.destroy();
+
+        // Примерные данные голосования по школе
+        const fatigueData = {
+            'Ранний подъём': 42,
+            'Шум на переменах': 18,
+            'Бесконечная домашка': 28,
+            'Ожидание каникул': 12
+        };
+
+        fatigueChartInstance = new Chart(ctxFatigue, {
+            type: 'bar',
+            data: {
+                labels: ['Подъём', 'Шум', 'Домашка', 'Каникулы'],
+                datasets: [{
+                    data: [fatigueData['Ранний подъём'], fatigueData['Шум на переменах'], fatigueData['Бесконечная домашка'], fatigueData['Ожидание каникул']],
+                    backgroundColor: function(context) {
+                        const label = context.chart.data.labels[context.dataIndex];
+                        // Подсвечиваем вариант пользователя лаймовым, остальные — фиолетовым/серым
+                        if ((selectedFatigue.includes('подъём') && label === 'Подъём') ||
+                            (selectedFatigue.includes('Шум') && label === 'Шум') ||
+                            (selectedFatigue.includes('домашка') && label === 'Домашка') ||
+                            (selectedFatigue.includes('каникул') && label === 'Каникулы')) {
+                            return '#CCFF00';
+                        }
+                        return '#27272A';
                     },
-                    x: { 
-                        grid: { display: false },
-                        ticks: { color: '#F4F4F5' }
-                    }
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#27272A' }, ticks: { color: '#A1A1AA' } },
+                    x: { grid: { display: false }, ticks: { color: '#F4F4F5', font: { size: 10 } } }
                 }
             }
         });
